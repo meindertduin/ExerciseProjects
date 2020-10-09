@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using BlazorLiveChatWebSocketExercise.Infrastructure;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BlazorLiveChatWebSocketExercise.Middleware
 {
@@ -7,6 +9,12 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
         public static IApplicationBuilder UseWebSocketServer(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<WebSocketServerMiddleware>();
+        }
+
+        public static IServiceCollection AddWebSocketServerConnectionManager(this IServiceCollection services)
+        {
+            services.AddSingleton<WebSocketConnectionManager>();
+            return services;
         }
     }
 }

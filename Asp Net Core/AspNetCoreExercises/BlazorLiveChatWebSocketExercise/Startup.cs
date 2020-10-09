@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BlazorLiveChatWebSocketExercise.Data;
+using BlazorLiveChatWebSocketExercise.Infrastructure;
 using BlazorLiveChatWebSocketExercise.Middleware;
 using Microsoft.AspNetCore.Http;
 
@@ -27,7 +28,8 @@ namespace BlazorLiveChatWebSocketExercise
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddTransient<IWebSocketClient, WebSocketClient>();
+            services.AddWebSocketServerConnectionManager();
         }
         
 

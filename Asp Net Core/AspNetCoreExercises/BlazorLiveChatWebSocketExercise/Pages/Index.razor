@@ -1,11 +1,20 @@
 ﻿@page "/"
-@using System.Net.WebSockets
-@using System.Security.Policy
-@using System.Threading
+@implements IDisposable
+@using BlazorLiveChatWebSocketExercise.Infrastructure
+@inject IWebSocketClient webSocketClient
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<div class="row">
+    <ul>
+        @foreach (var message in _messages)
+        {
+            <li>@message</li>
+        }
+    </ul>
+</div>
 
 <div class="row">
     <input placeholder="state your username" @bind="username">
@@ -14,15 +23,29 @@ Welcome to your new app.
 
 @code{
     private string username = "";
-    private string webSocketUrl = "wss://localhost:5001/ws";
+    private string chatUrl = "wss://localhost:5001/ws";
+    
+    private List<string> _messages = new List<string>();
+
+    protected override void OnInitialized()
+    {
+        webSocketClient.OnMessageReceived += Handle;
+    }
+
+    private void Handle(object sender, WebSocketTextMessageModel e)
+    {
+        _messages.Add(e.Message);
+        StateHasChanged();
+    }
+    
     
     private async Task ConnectToChat()
     {
-        using (var client = new ClientWebSocket())
-        {
-            var buffer = new byte[1024 * 4];
-            await client.ConnectAsync(new Uri(webSocketUrl), CancellationToken.None);
-            await client.CloseAsync(WebSocketCloseStatus.NormalClosure, "websocket is closing", CancellationToken.None);
-        }
+        await webSocketClient.StartConnection(chatUrl);
+    }
+    
+    public void Dispose()
+    {
+        webSocketClient.DisposeAsync();
     }
 }
