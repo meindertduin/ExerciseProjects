@@ -1,0 +1,28 @@
+﻿@page "/"
+@using System.Net.WebSockets
+@using System.Security.Policy
+@using System.Threading
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<div class="row">
+    <input placeholder="state your username" @bind="username">
+    <button @onclick="ConnectToChat"></button>
+</div>
+
+@code{
+    private string username = "";
+    private string webSocketUrl = "wss://localhost:5001/ws";
+    
+    private async Task ConnectToChat()
+    {
+        using (var client = new ClientWebSocket())
+        {
+            var buffer = new byte[1024 * 4];
+            await client.ConnectAsync(new Uri(webSocketUrl), CancellationToken.None);
+            await client.CloseAsync(WebSocketCloseStatus.NormalClosure, "websocket is closing", CancellationToken.None);
+        }
+    }
+}

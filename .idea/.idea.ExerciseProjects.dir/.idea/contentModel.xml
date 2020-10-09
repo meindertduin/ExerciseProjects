@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\Meindert\AppData\Local\JetBrains\Rider2020.1\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\Meindert\AppData\Local\JetBrains\Rider2020.1\resharper-host\Local\Transient\ReSharperHost\v201\SolutionCaches\_.19.00" t="ExcludeRecursive" />
+    <e p="C:\Users\Meindert\AppData\Roaming\JetBrains\Rider2020.1\consoles\db" t="IncludeRecursive" />
+    <e p="C:\Users\Meindert\AppData\Roaming\JetBrains\Rider2020.1\extensions" t="IncludeRecursive" />
+    <e p="C:\Users\Meindert\AppData\Roaming\JetBrains\Rider2020.1\plugins\bashsupport-pro\builtin" t="IncludeRecursive" />
+    <e p="D:\Dev\exerciseprojects\exerciseprojects" t="IncludeFlat">
+      <e p=".git\info\exclude" t="IncludeRecursive" />
+    </e>
+  </component>
+</project>
