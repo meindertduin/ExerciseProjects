@@ -34,7 +34,7 @@ namespace BlazorLiveChatWebSocketExercise.Infrastructure
         public async Task SendMessage(WebSocketMessageModel messageModel)
         {
             var data = _binaryModelSerializer.ToByteArray(messageModel);
-            await _clientWebSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None);
+            await _clientWebSocket.SendAsync(data, WebSocketMessageType.Binary, true, CancellationToken.None);
         }
         public void SendMessageToPages(WebSocketMessageModel message)
         {
@@ -58,9 +58,16 @@ namespace BlazorLiveChatWebSocketExercise.Infrastructure
             byte[] buffer = new byte[1024];
             while (_clientWebSocket.State == WebSocketState.Open)
             {
-                WebSocketReceiveResult result = await _clientWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                var data = _binaryModelSerializer.FromByteArray<WebSocketMessageModel>(buffer);
-                SendMessageToPages(data);
+                try
+                {
+                    WebSocketReceiveResult result = await _clientWebSocket.ReceiveAsync(buffer, CancellationToken.None);
+                    var data = _binaryModelSerializer.FromByteArray<WebSocketMessageModel>(buffer);
+                    SendMessageToPages(data);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
 
             try

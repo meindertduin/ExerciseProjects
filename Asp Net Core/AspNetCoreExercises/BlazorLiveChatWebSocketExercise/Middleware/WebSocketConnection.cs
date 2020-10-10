@@ -25,7 +25,7 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
         {
             await LoopForMessages(_webSocket, async (result, buffer) =>
             {
-                if (result.MessageType == WebSocketMessageType.Text)
+                if (result.MessageType == WebSocketMessageType.Binary)
                 {
                     BinaryModelSerializer binaryModelSerializer = new BinaryModelSerializer();
                     var message = binaryModelSerializer.FromByteArray<WebSocketMessageModel>(buffer);
@@ -34,8 +34,6 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
                     {
                         _userName = message.UserName;
                     }
-                    
-                    
                 }
                 else if (result.MessageType == WebSocketMessageType.Close)
                 {
@@ -85,7 +83,7 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
             BinaryModelSerializer serializer = new BinaryModelSerializer();
             
             var buffer = serializer.ToByteArray(webSocketTextMessageModel);
-            await _webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+            await _webSocket.SendAsync(buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
         }
     }
 }
