@@ -26,20 +26,18 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
             {
                 if (context.WebSockets.IsWebSocketRequest)
                 {
-                    WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                    var connID = _connectionManager.AddSocket(webSocket);
-                    await SendSocketAsync(webSocket, connID);
-                    await ReceiveMessage(webSocket, async (result, buffer) =>
+                    var connection = new WebSocketConnection();
+                    await connection.CreateConnection(context);
+                    _connectionManager.AddConnection(connection);
+                    
+                    await connection.SendTextMessage(new WebSocketMessageModel
                     {
-                        if (result.MessageType == WebSocketMessageType.Text)
-                        {
-                        
-                        }
-                        else if (result.MessageType == WebSocketMessageType.Close)
-                        {
-                            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-                        }
+                        MessageType = MessageType.TextMessage,
+                        ConnectionId = connection.GetConnectionId,
+                        Message = $"connection established with connection id: {connection.GetConnectionId}",
                     });
+                    
+                    await connection.ListenMessages();
                 }
                 else
                 {
@@ -49,51 +47,6 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
             else
             {
                 await _next(context);
-            }
-        }
-
-        private async Task SendSocketAsync(WebSocket socket, string connID)
-        {
-            BinaryModelSerializer serializer = new BinaryModelSerializer();
-            var buffer = serializer.ToByteArray(new WebSocketTextMessageModel
-            {
-                ConnectionId = connID,
-                Message = $"connection established with connection id: {connID}",
-            });
-            
-            await socket.SendAsync(buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
-        }
-        
-        private async Task ReceiveMessage(WebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)
-        {
-            var buffer = new byte[1024];
-
-            while (socket.State == WebSocketState.Open)
-            {
-                var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                handleMessage(result, buffer);
-            }
-
-            try
-            {
-                await CloseConnection(socket);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }
-
-        private async Task CloseConnection(WebSocket webSocket)
-        {
-            if (webSocket != null)
-            {
-                if (webSocket.State == WebSocketState.Open ||
-                    webSocket.State == WebSocketState.CloseReceived ||
-                    webSocket.State == WebSocketState.CloseSent)
-                {
-                    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "closing", CancellationToken.None);
-                }
             }
         }
     }

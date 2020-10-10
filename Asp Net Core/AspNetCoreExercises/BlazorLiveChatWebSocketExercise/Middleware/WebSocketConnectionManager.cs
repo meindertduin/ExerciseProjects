@@ -2,23 +2,22 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using BlazorLiveChatWebSocketExercise.Middleware;
 
 namespace BlazorLiveChatWebSocketExercise.Infrastructure
 {
     public class WebSocketConnectionManager
     {
-        private ConcurrentDictionary<string, WebSocket> _sockets = new ConcurrentDictionary<string, WebSocket>();
+        private ConcurrentDictionary<string, WebSocketConnection> _connections = new ConcurrentDictionary<string, WebSocketConnection>();
 
-        public string AddSocket(WebSocket socket)
+        public void AddConnection(WebSocketConnection webSocketConnection)
         {
-            string connID = Guid.NewGuid().ToString();
-            _sockets.TryAdd(connID, socket);
-            return connID;
+            _connections.TryAdd(webSocketConnection.GetConnectionId, webSocketConnection);
         }
 
-        public ConcurrentDictionary<string, WebSocket> GetAllSockets()
+        public ConcurrentDictionary<string, WebSocketConnection> GetAllSockets()
         {
-            return _sockets;
+            return _connections;
         }
     }
 }

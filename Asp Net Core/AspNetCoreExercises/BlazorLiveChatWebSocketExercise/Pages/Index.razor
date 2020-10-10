@@ -24,6 +24,7 @@ Welcome to your new app.
 @code{
     private string username = "";
     private string chatUrl = "wss://localhost:5001/ws";
+    private bool connected = false;
     
     private List<string> _messages = new List<string>();
 
@@ -32,17 +33,18 @@ Welcome to your new app.
         webSocketClient.OnMessageReceived += Handle;
     }
 
-    private void Handle(object sender, WebSocketTextMessageModel e)
+    private void Handle(object sender, WebSocketMessageModel e)
     {
         _messages.Add(e.Message);
         StateHasChanged();
     }
     
-    
     private async Task ConnectToChat()
     {
-        await webSocketClient.StartConnection(chatUrl);
+        await webSocketClient.StartConnection(chatUrl, username);
+        connected = true;
     }
+    
     
     public void Dispose()
     {

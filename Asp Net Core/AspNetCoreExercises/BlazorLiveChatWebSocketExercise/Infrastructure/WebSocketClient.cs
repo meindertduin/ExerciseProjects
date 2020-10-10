@@ -11,21 +11,32 @@ namespace BlazorLiveChatWebSocketExercise.Infrastructure
         private ClientWebSocket _clientWebSocket;
         private BinaryModelSerializer _binaryModelSerializer;
         
-        public event EventHandler<WebSocketTextMessageModel> OnMessageReceived;
+        public event EventHandler<WebSocketMessageModel> OnMessageReceived;
 
         public WebSocketClient()
         {
             _binaryModelSerializer = new BinaryModelSerializer();
         }
         
-        public async Task StartConnection(string url)
+        public async Task StartConnection(string url, string userName)
         {
             _clientWebSocket = new ClientWebSocket();
             await _clientWebSocket.ConnectAsync(new Uri(url), CancellationToken.None);
+            await SendMessage(new WebSocketMessageModel
+            {
+                MessageType = MessageType.InitializeMessage,
+                UserName = userName,
+            });
+            
             await ListenMessages(url);
         }
 
-        public void SendMessageToPages(WebSocketTextMessageModel message)
+        public async Task SendMessage(WebSocketMessageModel messageModel)
+        {
+            var data = _binaryModelSerializer.ToByteArray(messageModel);
+            await _clientWebSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+        public void SendMessageToPages(WebSocketMessageModel message)
         {
             OnMessageReceived?.Invoke(this, message);
         }
@@ -47,8 +58,8 @@ namespace BlazorLiveChatWebSocketExercise.Infrastructure
             byte[] buffer = new byte[1024];
             while (_clientWebSocket.State == WebSocketState.Open)
             {
-                WebSocketReceiveResult result = await _clientWebSocket.ReceiveAsync(buffer, CancellationToken.None);
-                var data = _binaryModelSerializer.FromByteArray<WebSocketTextMessageModel>(buffer);
+                WebSocketReceiveResult result = await _clientWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                var data = _binaryModelSerializer.FromByteArray<WebSocketMessageModel>(buffer);
                 SendMessageToPages(data);
             }
 

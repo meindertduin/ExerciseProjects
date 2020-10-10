@@ -5,9 +5,10 @@ namespace BlazorLiveChatWebSocketExercise.Infrastructure
 {
     public interface IWebSocketClient : IAsyncDisposable
     {
-        public event EventHandler<WebSocketTextMessageModel> OnMessageReceived;
-        public Task StartConnection(string url);
-        public void SendMessageToPages(WebSocketTextMessageModel message);
+        public event EventHandler<WebSocketMessageModel> OnMessageReceived;
+        public Task StartConnection(string url, string userName);
+        void SendMessageToPages(WebSocketMessageModel message);
+        public Task SendMessage(WebSocketMessageModel messageModel);
 
         public Task CloseConnection();
     }
