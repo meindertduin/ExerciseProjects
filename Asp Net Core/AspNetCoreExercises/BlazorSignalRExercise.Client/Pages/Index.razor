@@ -1,0 +1,151 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.SignalR.Client
+@using Blazor.Extensions.Canvas
+@using Blazor.Extensions.Canvas.Canvas2D
+@using Blazor.Extensions
+@using Blazor.Extensions.Canvas.WebGL
+@using Microsoft.Extensions.DependencyInjection
+@using System.Globalization
+@using System.Threading
+@using BlazorSignalRExercise.Client.Models
+
+<div class="livechat">
+    <h1 class="livechat-header">
+        Livechat
+    </h1>
+    <div class="livechat-message-container">
+        @foreach (var message in _messages)
+        {
+            <div class="message-container">
+                <div class="message-header">
+                    @message.Username
+                </div>
+                <div class="message-content">
+                    <div class="message-time">
+                        @message.TimeSend.ToString("t", CultureInfo.CurrentCulture)
+                    </div>
+                    <div class="message">
+                        @message.Message
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="livechat-input-container">
+        @if (hubConnection != null && IsConnected)
+        {
+            <textarea @bind="messageValue" placeholder="type here your message..."></textarea>
+            <button @onclick="SendMessage">Send message</button>
+        }
+        else
+        {
+            <input placeholder="state your username" @bind="username">
+            <button @onclick="ConnectToChat">Join with username</button>
+        }
+    </div>
+</div>
+
+
+@code {
+    private HubConnection hubConnection;
+
+    private List<MessageModel> _messages = new List<MessageModel>();
+    private string messageValue;
+    private string username;
+    
+    private async Task ConnectToChat()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://localhost:5001/livechat")
+            .Build();
+
+        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            var messageModel = new MessageModel
+            {
+                Message = message,
+                Username = user,
+                TimeSend = DateTime.Now,
+            };
+            _messages.Add(messageModel);
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private void SendMessage()
+    {
+        hubConnection.SendAsync("SendMessage", username, messageValue);
+    }
+    
+    public bool IsConnected =>
+        hubConnection.State == HubConnectionState.Connected;
+        
+    public void Dispose()
+    {
+        _ = hubConnection.DisposeAsync();
+    }
+}
+
+<style>
+    .livechat{
+        width: 350px;
+        padding: 20px;
+        border-radius: 20px;
+        background-color: yellowgreen;
+        position: absolute;
+        right: 60%;
+        top: 60%;
+    }
+    
+    .livechat-header{
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .livechat-message-container{
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        height: 400px;
+        overflow-y: scroll;
+    }
+    
+    .message-container{
+        background-color: darkseagreen;
+        border-radius: 20px;
+        padding: 5px;
+        margin: 4px 2px 4px 2px;
+    }
+    
+    .message-header{
+        justify-self: center;  
+    }
+    
+    .message-content{
+        width: 300px;
+        display: flex;
+        flex-direction: row;
+        margin: 5px;
+    }
+    .message-time{
+        margin-right: 1em;
+    }
+    .message{
+        
+    }
+    
+    .livechat-input-container{
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        height: 100px;
+    }
+    .livechat-input-container > textarea button{
+        width: 100%;
+    }
+    
+    
+</style>
+
