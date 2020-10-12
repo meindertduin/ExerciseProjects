@@ -34,9 +34,9 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
                     {
                         _userName = message.UserName;
                     }
-                    else if(message.MessageType == MessageType.TextMessage)
+                    else if(message.MessageType == MessageType.BroadCastMessage)
                     {
-                           
+                        await BroadCastMessage(message);
                     }
                 }
                 else if (result.MessageType == WebSocketMessageType.Close)
@@ -66,6 +66,16 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
             catch (Exception e)
             {
                 Console.WriteLine(e);
+            }
+        }
+
+        private async Task BroadCastMessage(WebSocketMessageModel message)
+        {
+            var connections= WebSocketConnectionManager.GetAllSockets();
+            foreach (var connection in connections)
+            {
+                var socket = connection.Value;
+                await socket.SendTextMessage(message);
             }
         }
         

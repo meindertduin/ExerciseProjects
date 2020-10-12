@@ -3,6 +3,6 @@
     public enum MessageType
     {
         InitializeMessage = 0,
-        TextMessage = 1,
+        BroadCastMessage = 1,
     }
 }

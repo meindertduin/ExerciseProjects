@@ -6,44 +6,44 @@
 @using BlazorLiveChatWebSocketExercise.Middleware
 @inject IWebSocketClient webSocketClient
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
-
-<div class="row justify-content-center">
-    <div class="livechat">
-        <div class="livechat-message-container">
-            @foreach(var message in _messages)
-            {
-                <div class="message-container">
-                    <div class="message-header">
-                        Klaas
+<div class="livechat">
+    <h1 class="livechat-header">
+        Livechat
+    </h1>
+    <div class="livechat-message-container">
+        @foreach (var message in _messages)
+        {
+            <div class="message-container">
+                <div class="message-header">
+                    @message.UserName
+                </div>
+                <div class="message-content">
+                    <div class="message-time">
+                        @message.TimeSend.ToString("t", CultureInfo.CurrentCulture)
                     </div>
-                    <div class="message-content">
-                        <div class="message-time">
-                            @DateTime.Now.ToString("t", CultureInfo.CurrentCulture)
-                        </div>
-                        <div class="message">
-                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque dolorem error illo ipsa nemo nihil quae totam vel veniam.
-                        </div>
+                    <div class="message">
+                        @message.Message
                     </div>
                 </div>
-            }
-        </div>
-        <div class="livechat-input-container">
-            @if (webSocketState == WebSocketState.Open)
-            {
-                <textarea @bind="messageValue" placeholder="type here your message..."></textarea>
-                <button @onclick="SendMessage">Send message</button>
-            }
-            else
-            {
-                <input placeholder="state your username" @bind="username">
-                <button @onclick="ConnectToChat">Join with username</button>
-            }
-        </div>
+            </div>
+        }
+    </div>
+    <div class="livechat-input-container">
+        @if (webSocketState == WebSocketState.Open)
+        {
+            <textarea @bind="messageValue" placeholder="type here your message..."></textarea>
+            <button @onclick="SendMessage">Send message</button>
+        }
+        else
+        {
+            <input placeholder="state your username" @bind="username">
+            <button @onclick="ConnectToChat">Join with username</button>
+        }
     </div>
 </div>
+
+
 
 
 @code{
@@ -83,9 +83,10 @@ Welcome to your new app.
         {
             var message = new WebSocketMessageModel
             {
-                MessageType = MessageType.TextMessage,
+                MessageType = MessageType.BroadCastMessage,
                 Message = messageValue,
                 UserName = username,
+                TimeSend = DateTime.Now,
             };
             
             webSocketClient.SendMessage(message);
@@ -102,9 +103,21 @@ Welcome to your new app.
 <style>
     .livechat{
         width: 350px;
+        padding: 20px;
+        border-radius: 20px;
+        background-color: yellowgreen;
+        position: absolute;
+        right: 60%;
+        top: 60%;
+    }
+    
+    .livechat-header{
+        font-weight: bold;
+        text-align: center;
     }
 
     .livechat-message-container{
+        background-color: white;
         display: flex;
         flex-direction: column;
         height: 400px;
@@ -139,7 +152,6 @@ Welcome to your new app.
         padding: 5px;
         display: flex;
         flex-direction: column;
-        background-color: #1b1e21;
         height: 100px;
     }
     .livechat-input-container > textarea button{

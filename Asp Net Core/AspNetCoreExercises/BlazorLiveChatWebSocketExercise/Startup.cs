@@ -1,17 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Net.WebSockets;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using BlazorLiveChatWebSocketExercise.Data;
 using BlazorLiveChatWebSocketExercise.Infrastructure;
 using BlazorLiveChatWebSocketExercise.Middleware;
-using Microsoft.AspNetCore.Http;
 
 namespace BlazorLiveChatWebSocketExercise
 {
@@ -29,7 +23,6 @@ namespace BlazorLiveChatWebSocketExercise
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddTransient<IWebSocketClient, WebSocketClient>();
-            services.AddWebSocketServerConnectionManager();
         }
         
 

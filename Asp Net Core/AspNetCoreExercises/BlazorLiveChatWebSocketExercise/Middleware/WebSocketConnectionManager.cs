@@ -6,16 +6,16 @@ using BlazorLiveChatWebSocketExercise.Middleware;
 
 namespace BlazorLiveChatWebSocketExercise.Infrastructure
 {
-    public class WebSocketConnectionManager
+    public static class WebSocketConnectionManager
     {
-        private ConcurrentDictionary<string, WebSocketConnection> _connections = new ConcurrentDictionary<string, WebSocketConnection>();
+        private static ConcurrentDictionary<string, WebSocketConnection> _connections = new ConcurrentDictionary<string, WebSocketConnection>();
 
-        public void AddConnection(WebSocketConnection webSocketConnection)
+        public static void AddConnection(WebSocketConnection webSocketConnection)
         {
             _connections.TryAdd(webSocketConnection.GetConnectionId, webSocketConnection);
         }
 
-        public ConcurrentDictionary<string, WebSocketConnection> GetAllSockets()
+        public static ConcurrentDictionary<string, WebSocketConnection> GetAllSockets()
         {
             return _connections;
         }

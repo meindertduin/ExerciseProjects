@@ -10,11 +10,5 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
         {
             return builder.UseMiddleware<WebSocketServerMiddleware>();
         }
-
-        public static IServiceCollection AddWebSocketServerConnectionManager(this IServiceCollection services)
-        {
-            services.AddSingleton<WebSocketConnectionManager>();
-            return services;
-        }
     }
 }

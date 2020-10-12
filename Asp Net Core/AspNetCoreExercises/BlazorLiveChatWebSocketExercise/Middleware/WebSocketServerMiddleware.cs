@@ -12,12 +12,10 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
     public class WebSocketServerMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly WebSocketConnectionManager _connectionManager;
         
-        public WebSocketServerMiddleware(RequestDelegate next, WebSocketConnectionManager connectionManager)
+        public WebSocketServerMiddleware(RequestDelegate next)
         {
             _next = next;
-            _connectionManager = connectionManager;    
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -28,7 +26,7 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
                 {
                     var connection = new WebSocketConnection();
                     await connection.CreateConnection(context);
-                    _connectionManager.AddConnection(connection);
+                    WebSocketConnectionManager.AddConnection(connection);
                     await connection.ListenMessages();
                 }
                 else
