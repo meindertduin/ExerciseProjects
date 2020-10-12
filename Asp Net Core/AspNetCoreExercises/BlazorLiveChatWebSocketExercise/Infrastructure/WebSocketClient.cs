@@ -11,6 +11,7 @@ namespace BlazorLiveChatWebSocketExercise.Infrastructure
         private ClientWebSocket _clientWebSocket;
         private BinaryModelSerializer _binaryModelSerializer;
         
+        public event EventHandler<WebSocketState> OnWebSocketStateChanged;
         public event EventHandler<WebSocketMessageModel> OnMessageReceived;
 
         public WebSocketClient()
@@ -22,13 +23,18 @@ namespace BlazorLiveChatWebSocketExercise.Infrastructure
         {
             _clientWebSocket = new ClientWebSocket();
             await _clientWebSocket.ConnectAsync(new Uri(url), CancellationToken.None);
+            UpdateWebSocketStateOnPage(_clientWebSocket.State);
             await SendMessage(new WebSocketMessageModel
             {
                 MessageType = MessageType.InitializeMessage,
                 UserName = userName,
             });
-            
             await ListenMessages(url);
+        }
+
+        public void UpdateWebSocketStateOnPage(WebSocketState state)
+        {
+            OnWebSocketStateChanged?.Invoke(this, state);
         }
 
         public async Task SendMessage(WebSocketMessageModel messageModel)

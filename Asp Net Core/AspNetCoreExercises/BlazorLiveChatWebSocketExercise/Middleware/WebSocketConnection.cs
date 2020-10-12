@@ -34,6 +34,10 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
                     {
                         _userName = message.UserName;
                     }
+                    else if(message.MessageType == MessageType.TextMessage)
+                    {
+                           
+                    }
                 }
                 else if (result.MessageType == WebSocketMessageType.Close)
                 {

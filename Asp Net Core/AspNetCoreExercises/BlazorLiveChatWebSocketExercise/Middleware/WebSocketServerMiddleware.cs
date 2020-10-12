@@ -29,14 +29,6 @@ namespace BlazorLiveChatWebSocketExercise.Middleware
                     var connection = new WebSocketConnection();
                     await connection.CreateConnection(context);
                     _connectionManager.AddConnection(connection);
-                    
-                    await connection.SendTextMessage(new WebSocketMessageModel
-                    {
-                        MessageType = MessageType.TextMessage,
-                        ConnectionId = connection.GetConnectionId,
-                        Message = $"connection established with connection id: {connection.GetConnectionId}",
-                    });
-                    
                     await connection.ListenMessages();
                 }
                 else

@@ -1,53 +1,150 @@
 ﻿@page "/"
 @implements IDisposable
 @using BlazorLiveChatWebSocketExercise.Infrastructure
+@using System.Globalization
+@using System.Net.WebSockets
+@using BlazorLiveChatWebSocketExercise.Middleware
 @inject IWebSocketClient webSocketClient
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
 
-<div class="row">
-    <ul>
-        @foreach (var message in _messages)
-        {
-            <li>@message</li>
-        }
-    </ul>
+<div class="row justify-content-center">
+    <div class="livechat">
+        <div class="livechat-message-container">
+            @foreach(var message in _messages)
+            {
+                <div class="message-container">
+                    <div class="message-header">
+                        Klaas
+                    </div>
+                    <div class="message-content">
+                        <div class="message-time">
+                            @DateTime.Now.ToString("t", CultureInfo.CurrentCulture)
+                        </div>
+                        <div class="message">
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque dolorem error illo ipsa nemo nihil quae totam vel veniam.
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="livechat-input-container">
+            @if (webSocketState == WebSocketState.Open)
+            {
+                <textarea @bind="messageValue" placeholder="type here your message..."></textarea>
+                <button @onclick="SendMessage">Send message</button>
+            }
+            else
+            {
+                <input placeholder="state your username" @bind="username">
+                <button @onclick="ConnectToChat">Join with username</button>
+            }
+        </div>
+    </div>
 </div>
 
-<div class="row">
-    <input placeholder="state your username" @bind="username">
-    <button @onclick="ConnectToChat"></button>
-</div>
 
 @code{
     private string username = "";
+    private string messageValue = "";
     private string chatUrl = "wss://localhost:5001/ws";
-    private bool connected = false;
+    private WebSocketState webSocketState = WebSocketState.Closed;
     
-    private List<string> _messages = new List<string>();
+    private List<WebSocketMessageModel> _messages = new List<WebSocketMessageModel>();
 
     protected override void OnInitialized()
     {
-        webSocketClient.OnMessageReceived += Handle;
+        webSocketClient.OnMessageReceived += HandleMessage;
+        webSocketClient.OnWebSocketStateChanged += HandleStateUpdate;
     }
 
-    private void Handle(object sender, WebSocketMessageModel e)
+    private void HandleMessage(object sender, WebSocketMessageModel e)
     {
-        _messages.Add(e.Message);
+        _messages.Add(e);
+        StateHasChanged();
+    }
+    
+    private void HandleStateUpdate(object sender, WebSocketState e)
+    {
+        webSocketState = e;
         StateHasChanged();
     }
     
     private async Task ConnectToChat()
     {
         await webSocketClient.StartConnection(chatUrl, username);
-        connected = true;
     }
-    
+
+    private void SendMessage()
+    {
+        if (string.IsNullOrEmpty(messageValue) == false)
+        {
+            var message = new WebSocketMessageModel
+            {
+                MessageType = MessageType.TextMessage,
+                Message = messageValue,
+                UserName = username,
+            };
+            
+            webSocketClient.SendMessage(message);
+        }
+    }
     
     public void Dispose()
     {
         webSocketClient.DisposeAsync();
     }
 }
+
+
+<style>
+    .livechat{
+        width: 350px;
+    }
+
+    .livechat-message-container{
+        display: flex;
+        flex-direction: column;
+        height: 400px;
+        overflow-y: scroll;
+    }
+    
+    .message-container{
+        background-color: darkseagreen;
+        border-radius: 20px;
+        padding: 5px;
+        margin: 4px 2px 4px 2px;
+    }
+    
+    .message-header{
+        justify-self: center;  
+    }
+    
+    .message-content{
+        width: 300px;
+        display: flex;
+        flex-direction: row;
+        margin: 5px;
+    }
+    .message-time{
+        margin-right: 1em;
+    }
+    .message{
+        
+    }
+    
+    .livechat-input-container{
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        background-color: #1b1e21;
+        height: 100px;
+    }
+    .livechat-input-container > textarea button{
+        width: 100%;
+    }
+    
+    
+</style>
