@@ -1,0 +1,18 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Infrastructure";
+
+package greet;
+
+service ScreenSharer {
+  // Sends a greeting
+  rpc StreamScreen (stream ScreenStreamModel) returns (ScreenStreamReply);
+}
+
+message ScreenStreamModel {
+  bytes data = 1;
+}
+
+message ScreenStreamReply {
+  
+}

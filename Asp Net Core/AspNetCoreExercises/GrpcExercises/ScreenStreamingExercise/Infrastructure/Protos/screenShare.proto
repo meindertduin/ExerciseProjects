@@ -1,0 +1,15 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "WebClient";
+
+service ScreenShare {
+  rpc GetStreamData (stream screenShareUploadModel) returns (ScreenShareConfirmModel);
+}
+
+message screenShareUploadModel {
+  bytes data = 1;
+}
+
+message ScreenShareConfirmModel {
+  bool connected = 1;
+}
