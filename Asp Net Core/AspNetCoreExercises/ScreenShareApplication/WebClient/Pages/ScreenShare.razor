@@ -1,0 +1,23 @@
+﻿@page "/screenshare"
+@using Grpc.Net.Client
+@using Infrastructure
+
+<h1>Screenshare here</h1>
+
+
+@code
+{
+    private static GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:5001");
+    private ScreenSharer.ScreenSharerClient uploadClient = new ScreenSharer.ScreenSharerClient(channel);
+
+    private async Task StreamToServer()
+    {
+        using (var call = uploadClient.StreamScreen())
+        {
+            await call.RequestStream.WriteAsync(new ScreenStreamModel
+            {
+                Data = null,
+            });
+        }
+    }
+}

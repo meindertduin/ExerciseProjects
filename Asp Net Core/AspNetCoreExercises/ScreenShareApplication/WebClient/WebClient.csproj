@@ -15,4 +15,17 @@
         <PackageReference Include="System.Net.Http.Json" Version="3.2.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Update="Pages\ScreenShare.razor">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="..\Infrastructure\Protos\screenShare.proto">
+            <GrpcServices>Client</GrpcServices>
+            <OutputDir>obj\Debug\netcoreapp3.1\</OutputDir>
+        </Protobuf>
+    </ItemGroup>
+    
 </Project>
