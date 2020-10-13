@@ -17,14 +17,14 @@ void Main(){
 
 public IEnumerable<Task> CreateCalls(){
 	for(int i = 0; i < 1000; i++){
-		yield return CallGoogle();
+		yield return CallSemaphoreDocs();
 	}
 }
 
-public async Task CallGoogle(){
+public async Task CallSemaphoreDocs(){
 	try{
 		await _gate.WaitAsync();
-		var response = await _httpClient.GetAsync("https://google.com");
+		var response = await _httpClient.GetAsync("https://docs.microsoft.com/en-us/dotnet/api/system.threading.semaphoreslim?view=netcore-3.1");
 		_gate.Release();
 		response.StatusCode.Dump();
 	} catch(Exception e){

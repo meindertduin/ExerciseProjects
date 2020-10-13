@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorSignalRExercise.Clien
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorSingalRExercise.Server", "BlazorSingalRExercise.Server\BlazorSingalRExercise.Server.csproj", "{7D795191-ED13-48E1-9E67-34910D52DDEF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StreamingExercise.Server", "StreamingExercise.Server\StreamingExercise.Server.csproj", "{E4CB050C-A443-4B1B-B385-64D198A06393}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{7D795191-ED13-48E1-9E67-34910D52DDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D795191-ED13-48E1-9E67-34910D52DDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D795191-ED13-48E1-9E67-34910D52DDEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4CB050C-A443-4B1B-B385-64D198A06393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4CB050C-A443-4B1B-B385-64D198A06393}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4CB050C-A443-4B1B-B385-64D198A06393}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4CB050C-A443-4B1B-B385-64D198A06393}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
