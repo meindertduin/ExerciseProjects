@@ -1,21 +1,36 @@
 ﻿@page "/screenshare"
 @using Grpc.Net.Client
 @using Infrastructure
+@using Grpc.Core
+@using Microsoft.Extensions.Logging
+@using System.Net
 @inject IJSRuntime JsRuntime
+@using System.Net.Http
+@using System.Runtime.CompilerServices
+@using WebClient.JsInterop
+@inject HttpClient HttpBaseClient
 
 <h1>Screenshare here</h1>
 
 <button @onclick="StartRecording"></button>
 
+<select id="availableCameras"></select>
+
+<video id="video" autoplay></video>
 
 @code
 {
-    private static GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:5001");
-    private ScreenSharer.ScreenSharerClient uploadClient = new ScreenSharer.ScreenSharerClient(channel);
+    private static GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:5003");
+    private static ScreenSharer.ScreenSharerClient uploadClient = new ScreenSharer.ScreenSharerClient(channel);
+    private static AsyncClientStreamingCall<ScreenStreamModel, ScreenStreamReply> call = uploadClient.StreamScreen();
+    
+    
+    private static readonly List<object> _blobs = new List<object>();
 
     private async Task StartRecording()
     {
-        object mediaStream = await JsRuntime.InvokeAsync<object>("screenCapture.startCapture", new {Audio = true, video = true,});
+        var screenShareInterop = new ScreenShareInterop(JsRuntime);
+        await screenShareInterop.StartRecording();
     }
     
     private async Task StreamToServer()
@@ -28,5 +43,17 @@
             });
         }
     }
+
+    [JSInvokable]
+    public async Task AddBlobsAsync(string blobString)
+    {
+        
+        Console.WriteLine(blobString);
+        var client = new HttpClient();
+        var bytes = await client.GetByteArrayAsync(blobString);
+        await call.RequestStream.WriteAsync(new ScreenStreamModel() { Data = Google.Protobuf.ByteString.CopyFrom(bytes) });
+        await JsRuntime.InvokeVoidAsync("screenCapture.revokeBlobUrl", blobString);
+    }
+    
 }
 

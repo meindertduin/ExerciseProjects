@@ -1,21 +1,26 @@
 ﻿window.screenCapture = {
-    async startCapture(displayMediaOption){
-        let captureStream = null;
-        console.log(displayMediaOption);
+    async startCapture(dotnetHelper){
         try {
-            captureStream = await navigator.mediaDevices.getUserMedia(displayMediaOption);
+            const videoElem = document.getElementById("video");
+            const stream  = await navigator.mediaDevices.getDisplayMedia({
+                video: { mediaSource: "screen" }
+            });
+
+            const image = new Image();
+            
+            const recorder = new MediaRecorder(stream);
+            recorder.ondataavailable = event => {
+                const url = URL.createObjectURL(event.data);
+                dotnetHelper.invokeMethodAsync('GiveBlobUrl', url);
+            };
+            
+            recorder.start(500);
+            
         }catch (err) {
             console.log(err);
         }
-        return captureStream;
     },
-    async getConnectedDevices(type, callback){
-        navigator.mediaDevices.enumerateDevices()
-            .then(devices => {
-                const filtered = devices.filter(devices => devices.kind === type);
-            }).catch(err => console.log(err));
-    },
-    async displayConnectedDevices(){
-        await this.getConnectedDevices('videoInput', cameras => console.log(cameras));
-    } 
+    revokeBlobUrl(url){
+        URL.revokeObjectURL(url);
+    }
 }
