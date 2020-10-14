@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.JSInterop;
+using WebClient.Domain;
 
 namespace WebClient.JsInterop
 {
@@ -10,5 +11,7 @@ namespace WebClient.JsInterop
         {
             Console.WriteLine(blobUrl);
         }
+
+        
     }
 }

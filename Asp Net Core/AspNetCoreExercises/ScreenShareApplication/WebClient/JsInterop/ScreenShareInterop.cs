@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
+using WebClient.Domain;
 
 namespace WebClient.JsInterop
 {

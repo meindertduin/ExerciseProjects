@@ -31,9 +31,5 @@
             <OutputDir>obj\Debug\netcoreapp3.1\</OutputDir>
         </Protobuf>
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Domain" />
-    </ItemGroup>
     
 </Project>
