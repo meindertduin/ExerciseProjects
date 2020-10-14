@@ -1,8 +1,11 @@
 ﻿@page "/screenshare"
 @using Grpc.Net.Client
 @using Infrastructure
+@inject IJSRuntime JsRuntime
 
 <h1>Screenshare here</h1>
+
+<button @onclick="StartRecording"></button>
 
 
 @code
@@ -10,6 +13,11 @@
     private static GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:5001");
     private ScreenSharer.ScreenSharerClient uploadClient = new ScreenSharer.ScreenSharerClient(channel);
 
+    private async Task StartRecording()
+    {
+        object mediaStream = await JsRuntime.InvokeAsync<object>("screenCapture.startCapture", new {Audio = true, video = true,});
+    }
+    
     private async Task StreamToServer()
     {
         using (var call = uploadClient.StreamScreen())
@@ -21,3 +29,4 @@
         }
     }
 }
+
