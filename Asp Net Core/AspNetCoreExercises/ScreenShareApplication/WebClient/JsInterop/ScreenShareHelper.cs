@@ -9,7 +9,7 @@ using Microsoft.JSInterop;
 
 namespace WebClient.JsInterop
 {
-    public class ScreenShareHelper
+    public class ScreenShareHelper : IDisposable
     {
         private readonly HttpClient _client;
         private GrpcChannel _channel;
@@ -17,7 +17,6 @@ namespace WebClient.JsInterop
         private AsyncClientStreamingCall<ScreenStreamModel, ScreenStreamReply> _call;
 
         private bool _isStreaing = false;
-        private object _writeLock;
 
         public ScreenShareHelper()
         {
@@ -25,7 +24,6 @@ namespace WebClient.JsInterop
             _channel = GrpcChannel.ForAddress("https://localhost:5003");
             _uploadClient = new ScreenSharer.ScreenSharerClient(_channel);
             _call = _uploadClient.StreamScreen();
-            _writeLock = new object();
         }
         
         [JSInvokable]
@@ -60,6 +58,13 @@ namespace WebClient.JsInterop
                 await _call.RequestStream.CompleteAsync();
                 _isStreaing = false;
             }
+        }
+
+        public void Dispose()
+        {
+            _client?.Dispose();
+            _channel?.Dispose();
+            _call?.Dispose();
         }
     }
 }
