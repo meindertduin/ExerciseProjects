@@ -13,6 +13,7 @@ window.screenCapture = {
             recorder = new MediaRecorder(stream);
             recorder.ondataavailable = async event => {
                 const url = URL.createObjectURL(event.data);
+                console.log(event.data.type);
                 await dotnetHelper.invokeMethodAsync('HandleBlobUrl', url);
                 URL.revokeObjectURL(url);
             };

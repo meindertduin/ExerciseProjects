@@ -33,9 +33,9 @@ namespace Server.Services
             {
                 var dataChunk = requestStream.Current.Data;
                 Console.WriteLine(dataChunk.Length);
-                using (Stream fs = File.OpenWrite(savePath))
+                using (MemoryStream ms = new MemoryStream(dataChunk.ToByteArray()))
                 {
-                    fs.Write(dataChunk.ToByteArray());
+                    await File.WriteAllBytesAsync(savePath, dataChunk.ToByteArray());
                 }
                 
                 await _videoStreamWriter.WriteAsync(new IncomingStreamModel
