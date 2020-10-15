@@ -18,10 +18,10 @@ namespace Server
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddGrpc();
             services.AddHostedService<VideoEditingBackgroundService>();
             services.AddSingleton(Channel.CreateUnbounded<IncomingStreamModel>());
-            services.AddTransient<ScreenShareService>();
+            services.AddScoped<ScreenShareServiceHelper>();
+            services.AddGrpc();
             
             services.AddCors(options =>
             {

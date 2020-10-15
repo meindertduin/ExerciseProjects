@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Grpc.Core;
@@ -35,18 +37,22 @@ namespace WebClient.JsInterop
             }
             
             var bytes = await _client.GetByteArrayAsync(blobUrl);
-            var byteString = ByteString.CopyFrom(bytes);
+            
+            using (var stream = new MemoryStream(bytes))
+            {
+                var byteString = await ByteString.FromStreamAsync(stream, CancellationToken.None);
 
-            try
-            {
-                await _call.RequestStream.WriteAsync(new ScreenStreamModel
+                try
                 {
-                    Data = byteString,
-                });
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
+                    await _call.RequestStream.WriteAsync(new ScreenStreamModel
+                    {
+                        Data = byteString,
+                    });
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
         }
 

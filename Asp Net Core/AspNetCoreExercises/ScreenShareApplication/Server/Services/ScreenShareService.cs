@@ -16,13 +16,13 @@ namespace Server.Services
     public class ScreenShareService: ScreenSharer.ScreenSharerBase
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ScreenShareServiceHelper _serviceHelper;
         private readonly ILogger _logger;
-        private readonly ChannelWriter<IncomingStreamModel> _videoStreamWriter;
 
-        public ScreenShareService(Channel<IncomingStreamModel> videoStreamChannel, IWebHostEnvironment webHostEnvironment)
+        public ScreenShareService(IWebHostEnvironment webHostEnvironment, ScreenShareServiceHelper serviceHelper)
         {
             _webHostEnvironment = webHostEnvironment;
-            _videoStreamWriter = videoStreamChannel.Writer;
+            _serviceHelper = serviceHelper;
         }
 
         public override async Task<ScreenStreamReply> StreamScreen(IAsyncStreamReader<ScreenStreamModel> requestStream, ServerCallContext context)
@@ -33,12 +33,7 @@ namespace Server.Services
             {
                 var dataChunk = requestStream.Current.Data;
                 Console.WriteLine(dataChunk.Length);
-                using (MemoryStream ms = new MemoryStream(dataChunk.ToByteArray()))
-                {
-                    await File.WriteAllBytesAsync(savePath, dataChunk.ToByteArray());
-                }
-                
-                await _videoStreamWriter.WriteAsync(new IncomingStreamModel
+                await _serviceHelper.FeedDataToChannel(new IncomingStreamModel
                 {
                     Data = dataChunk,
                 });
