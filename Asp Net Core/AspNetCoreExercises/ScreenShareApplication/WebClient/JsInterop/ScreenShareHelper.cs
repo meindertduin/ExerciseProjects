@@ -25,34 +25,19 @@ namespace WebClient.JsInterop
             _client = new HttpClient();
             _channel = GrpcChannel.ForAddress("https://localhost:5003");
             _uploadClient = new ScreenSharer.ScreenSharerClient(_channel);
-            _call = _uploadClient.StreamScreen();
         }
         
         [JSInvokable]
         public async Task HandleBlobUrl(string blobUrl)
         {
-            if (_isStreaing == false)
-            {
-                _isStreaing = true;
-            }
-            
             var bytes = await _client.GetByteArrayAsync(blobUrl);
-            
             using (var stream = new MemoryStream(bytes))
             {
                 var byteString = await ByteString.FromStreamAsync(stream, CancellationToken.None);
-
-                try
+                var reply = await _uploadClient.StreamScreenAsync(new ScreenStreamModel
                 {
-                    await _call.RequestStream.WriteAsync(new ScreenStreamModel
-                    {
-                        Data = byteString,
-                    });
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                    Data = byteString
+                });
             }
         }
 
@@ -62,6 +47,7 @@ namespace WebClient.JsInterop
             if (_isStreaing)
             {
                 await _call.RequestStream.CompleteAsync();
+                _call.Dispose();
                 _isStreaing = false;
             }
         }

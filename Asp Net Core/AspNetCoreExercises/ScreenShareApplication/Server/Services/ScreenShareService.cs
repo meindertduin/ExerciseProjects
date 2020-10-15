@@ -25,21 +25,18 @@ namespace Server.Services
             _serviceHelper = serviceHelper;
         }
 
-        public override async Task<ScreenStreamReply> StreamScreen(IAsyncStreamReader<ScreenStreamModel> requestStream, ServerCallContext context)
+        public override Task<ScreenStreamReply> StreamScreen(ScreenStreamModel request, ServerCallContext context)
         {
-            var savePath = Path.Combine(_webHostEnvironment.WebRootPath, "ffmpeg", string.Concat(Path.GetRandomFileName(), ".mp4"));
-            
-            while (await requestStream.MoveNext(CancellationToken.None))
+            var dataChunk = request.Data;
+            _serviceHelper.FeedDataToChannel(new IncomingStreamModel
             {
-                var dataChunk = requestStream.Current.Data;
-                Console.WriteLine(dataChunk.Length);
-                await _serviceHelper.FeedDataToChannel(new IncomingStreamModel
-                {
-                    Data = dataChunk,
-                });
-            }
+                Data = dataChunk,
+            });
 
-            return new ScreenStreamReply();
+            return Task.FromResult(new ScreenStreamReply
+            {
+                Status = 200,
+            });
         }
     }
 }

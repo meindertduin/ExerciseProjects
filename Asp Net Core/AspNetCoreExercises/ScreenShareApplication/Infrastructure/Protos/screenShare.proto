@@ -5,7 +5,7 @@ option csharp_namespace = "Infrastructure";
 package greet;
 
 service ScreenSharer {
-  rpc StreamScreen (stream ScreenStreamModel) returns (ScreenStreamReply);
+  rpc StreamScreen (ScreenStreamModel) returns (ScreenStreamReply);
 }
 
 message ScreenStreamModel {
@@ -13,5 +13,5 @@ message ScreenStreamModel {
 }
 
 message ScreenStreamReply {
-  
+  int32 status = 1;
 }

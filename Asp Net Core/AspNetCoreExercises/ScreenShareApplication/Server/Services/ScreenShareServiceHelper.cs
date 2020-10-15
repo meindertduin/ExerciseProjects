@@ -13,9 +13,10 @@ namespace Server.Services
             _videoStreamChannel = videoStreamChannel;
         }
 
-        public async Task FeedDataToChannel(IncomingStreamModel incomingStream)
+        public Task FeedDataToChannel(IncomingStreamModel incomingStream)
         {
-            await _videoStreamChannel.Writer.WriteAsync(incomingStream);
+            _videoStreamChannel.Writer.WriteAsync(incomingStream);
+            return Task.CompletedTask;
         }
     }
 }

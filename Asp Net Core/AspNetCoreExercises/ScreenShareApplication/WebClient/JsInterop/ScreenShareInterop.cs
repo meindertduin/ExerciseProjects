@@ -28,7 +28,6 @@ namespace WebClient.JsInterop
             return _jsRuntime.InvokeAsync<string>("screenCapture.stopCapture", objRef);
         }
         
-        
         public void Dispose()
         {
             objRef?.Dispose();
