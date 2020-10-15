@@ -6,7 +6,7 @@ package greet;
 
 service ScreenSharer {
   // Sends a greeting
-  rpc StreamScreen (stream ScreenStreamModel) returns (stream ScreenStreamReply);
+  rpc StreamScreen (stream ScreenStreamModel) returns (ScreenStreamReply);
 }
 
 message ScreenStreamModel {

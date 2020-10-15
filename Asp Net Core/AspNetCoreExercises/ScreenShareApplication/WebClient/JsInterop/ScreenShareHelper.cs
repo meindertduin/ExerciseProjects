@@ -14,7 +14,7 @@ namespace WebClient.JsInterop
         private readonly HttpClient _client;
         private GrpcChannel _channel;
         private ScreenSharer.ScreenSharerClient _uploadClient;
-        private AsyncDuplexStreamingCall<ScreenStreamModel, ScreenStreamReply> _call;
+        private AsyncClientStreamingCall<ScreenStreamModel, ScreenStreamReply> _call;
 
         private bool _isStreaing = false;
         private object _writeLock;
@@ -34,14 +34,8 @@ namespace WebClient.JsInterop
             if (_isStreaing == false)
             {
                 _isStreaing = true;
-                var readTask = Task.Run(async () =>
-                {
-                    await foreach (var response in _call.ResponseStream.ReadAllAsync())
-                    {
-                        Console.WriteLine("package delivered");
-                    }
-                });
             }
+            
             var bytes = await _client.GetByteArrayAsync(blobUrl);
             var byteString = ByteString.CopyFrom(bytes);
 

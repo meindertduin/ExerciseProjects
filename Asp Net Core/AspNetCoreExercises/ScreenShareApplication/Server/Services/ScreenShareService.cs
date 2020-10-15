@@ -25,7 +25,7 @@ namespace Server.Services
             _videoStreamWriter = videoStreamChannel.Writer;
         }
 
-        public override async Task StreamScreen(IAsyncStreamReader<ScreenStreamModel> requestStream, IServerStreamWriter<ScreenStreamReply> responseStream, ServerCallContext context)
+        public override async Task<ScreenStreamReply> StreamScreen(IAsyncStreamReader<ScreenStreamModel> requestStream, ServerCallContext context)
         {
             var savePath = Path.Combine(_webHostEnvironment.WebRootPath, "ffmpeg", string.Concat(Path.GetRandomFileName(), ".mp4"));
             
@@ -42,8 +42,9 @@ namespace Server.Services
                 {
                     Data = dataChunk,
                 });
-                await responseStream.WriteAsync(new ScreenStreamReply());
             }
+
+            return new ScreenStreamReply();
         }
     }
 }
