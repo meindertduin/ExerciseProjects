@@ -5,15 +5,16 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Server.Models;
 
 namespace Server.Services
 {
     public class VideoEditingBackgroundService : BackgroundService
     {
         private readonly IWebHostEnvironment _env;
-        private ChannelReader<byte[]> _videoFileReader;
+        private ChannelReader<IncomingStreamModel> _videoFileReader;
 
-        public VideoEditingBackgroundService(Channel<byte[]> videoFileChannel, IWebHostEnvironment env)
+        public VideoEditingBackgroundService(Channel<IncomingStreamModel> videoFileChannel, IWebHostEnvironment env)
         {
             _env = env;
             _videoFileReader = videoFileChannel.Reader;
@@ -21,13 +22,15 @@ namespace Server.Services
         
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (await _videoFileReader.WaitToReadAsync(stoppingToken))
+            var message = string.Empty;
+            
+            while (_videoFileReader.Completion.IsCompleted == false)
             {
                 var chunk = await _videoFileReader.ReadAsync(stoppingToken);
                 var savePath = Path.Combine(_env.ContentRootPath, "ffmpeg", Path.GetRandomFileName());
                 using (Stream fs = File.OpenWrite(savePath))
                 {
-                    fs.Write(chunk);
+                    fs.Write(chunk.Data.ToByteArray());
                 }
             }
         }

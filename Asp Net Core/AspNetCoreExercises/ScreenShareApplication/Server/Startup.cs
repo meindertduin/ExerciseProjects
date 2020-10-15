@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Server.Models;
 using Server.Services;
 
 namespace Server
@@ -19,7 +20,8 @@ namespace Server
         {
             services.AddGrpc();
             services.AddHostedService<VideoEditingBackgroundService>();
-            services.AddSingleton(Channel.CreateUnbounded<Byte[]>());
+            services.AddSingleton(Channel.CreateUnbounded<IncomingStreamModel>());
+            services.AddTransient<ScreenShareService>();
             
             services.AddCors(options =>
             {

@@ -9,6 +9,7 @@ using Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Server.Models;
 
 namespace Server.Services
 {
@@ -16,9 +17,9 @@ namespace Server.Services
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger _logger;
-        private readonly ChannelWriter<Byte[]> _videoStreamWriter;
+        private readonly ChannelWriter<IncomingStreamModel> _videoStreamWriter;
 
-        public ScreenShareService([FromServices] Channel<byte[]> videoStreamChannel, IWebHostEnvironment webHostEnvironment)
+        public ScreenShareService(Channel<IncomingStreamModel> videoStreamChannel, IWebHostEnvironment webHostEnvironment)
         {
             _webHostEnvironment = webHostEnvironment;
             _videoStreamWriter = videoStreamChannel.Writer;
@@ -26,11 +27,21 @@ namespace Server.Services
 
         public override async Task StreamScreen(IAsyncStreamReader<ScreenStreamModel> requestStream, IServerStreamWriter<ScreenStreamReply> responseStream, ServerCallContext context)
         {
+            var savePath = Path.Combine(_webHostEnvironment.WebRootPath, "ffmpeg", string.Concat(Path.GetRandomFileName(), ".mp4"));
+            
             while (await requestStream.MoveNext(CancellationToken.None))
             {
                 var dataChunk = requestStream.Current.Data;
                 Console.WriteLine(dataChunk.Length);
-                await _videoStreamWriter.WriteAsync(dataChunk.ToByteArray());
+                using (Stream fs = File.OpenWrite(savePath))
+                {
+                    fs.Write(dataChunk.ToByteArray());
+                }
+                
+                await _videoStreamWriter.WriteAsync(new IncomingStreamModel
+                {
+                    Data = dataChunk,
+                });
                 await responseStream.WriteAsync(new ScreenStreamReply());
             }
         }
