@@ -20,6 +20,16 @@ namespace Server
             services.AddGrpc();
             services.AddHostedService<VideoEditingBackgroundService>();
             services.AddSingleton(Channel.CreateUnbounded<Byte[]>());
+            
+            services.AddCors(options =>
+            {
+                options.AddPolicy("server", builder =>
+                {
+                    builder.AllowAnyOrigin();
+                    builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -31,6 +41,8 @@ namespace Server
 
             app.UseRouting();
 
+            app.UseCors("server");
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<ScreenShareService>();

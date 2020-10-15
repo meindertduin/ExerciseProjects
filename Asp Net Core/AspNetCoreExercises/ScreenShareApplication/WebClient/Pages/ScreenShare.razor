@@ -1,65 +1,25 @@
 ﻿@page "/screenshare"
-@using Grpc.Net.Client
-@using Infrastructure
-@using Grpc.Core
-@using WebClient.Domain
-@inject IJSRuntime JsRuntime
 @using WebClient.JsInterop
-@inject HttpClient HttpBaseClient
-@inject StreamClient StreamClient
+@inject ScreenShareInterop ScreenShareInterop
 
 <h1>Screenshare here</h1>
 
-<button @onclick="StartRecording"></button>
-
-<select id="availableCameras"></select>
+<button @onclick="StartRecording">Start Recording</button>
+<button @onclick="StopRecording">Stop Recording</button>
 
 <video id="video" autoplay></video>
 
 @code
 {
-    private static GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:5003");
-    private static ScreenSharer.ScreenSharerClient uploadClient = new ScreenSharer.ScreenSharerClient(channel);
-    private static AsyncClientStreamingCall<ScreenStreamModel, ScreenStreamReply> call = uploadClient.StreamScreen();
-
-    protected override void OnInitialized()
-    {
-        StreamClient.value = 1;
-        StreamClient.SingletonFunction();
-    }
-
-
-    private static readonly List<object> _blobs = new List<object>();
 
     private async Task StartRecording()
     {
-        var screenShareInterop = new ScreenShareInterop(JsRuntime);
-        await screenShareInterop.StartRecording();
-    }
-    
-    
-    
-    private async Task StreamToServer()
-    {
-        using (var call = uploadClient.StreamScreen())
-        {
-            await call.RequestStream.WriteAsync(new ScreenStreamModel
-            {
-                Data = null,
-            });
-        }
+        await ScreenShareInterop.StartRecording();
     }
 
-    [JSInvokable]
-    public async Task AddBlobsAsync(string blobString)
+    private async Task StopRecording()
     {
-        
-        Console.WriteLine(blobString);
-        var client = new HttpClient();
-        var bytes = await client.GetByteArrayAsync(blobString);
-        await call.RequestStream.WriteAsync(new ScreenStreamModel() { Data = Google.Protobuf.ByteString.CopyFrom(bytes) });
-        await JsRuntime.InvokeVoidAsync("screenCapture.revokeBlobUrl", blobString);
+        await ScreenShareInterop.StopRecording();
     }
-    
 }
 
